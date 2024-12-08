@@ -1,0 +1,239 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Stack Navigator
+const Stack = createStackNavigator();
+
+// SignUp Screen
+const SignUpScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignUp = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password.');
+      return;
+    }
+
+    try {
+      await AsyncStorage.setItem(email, password);
+      Alert.alert('Success', 'Account created! You can now sign in.');
+      navigation.navigate('SignIn');
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred.');
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={styles.background}>
+      {/* Logo positioned at the top center */}
+      <Image
+        source={require('./NavUdark.png')} // Update with your image path
+        style={styles.logo}
+      />
+      
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
+
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <Text style={styles.title}>Create an Account</Text>
+        {/* Email Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        {/* Password Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+          <Text style={styles.link}>Already have an account? Sign In</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </View>
+  );
+};
+
+// SignIn Screen
+const SignInScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password.');
+      return;
+    }
+
+    try {
+      const storedPassword = await AsyncStorage.getItem(email);
+      if (storedPassword === password) {
+        Alert.alert('Success', 'Welcome!');
+        navigation.navigate('Map');
+      } else {
+        Alert.alert('Error', 'Invalid email or password.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred.');
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={styles.background}>
+      {/* Logo positioned at the top center */}
+      <Image
+        source={require('./NavUdark.png')} // Update with your image path
+        style={styles.logo}
+      />
+      
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
+
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <Text style={styles.title}>Sign In</Text>
+        {/* Email Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        {/* Password Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.link}>Don't have an account? Sign Up</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </View>
+  );
+};
+
+// Map Screen (Example Placeholder)
+const MapScreen = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Campus Map</Text>
+      <Text>Map will be displayed here.</Text>
+    </View>
+  );
+};
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="SignIn">
+        <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Map" component={MapScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+// Styles
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: '#F8F8F0', // Ivory White Background Color
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 40, // Add some space at the top for the logo
+  },
+  container: {
+    width: '85%',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff', // Background color for the container itself (not full screen)
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 10,
+    marginTop: 60, // Increased space to accommodate logo change
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#22277A', // Title color adjusted for contrast
+    marginBottom: 40,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    backgroundColor: '#f8f8f8',
+    fontSize: 16,
+  },
+  button: {
+    width: '40%',
+    height: 45, // Slightly smaller button
+    backgroundColor: '#007BFF', // Blue color for buttons
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  link: {
+    color: '#007BFF',
+    fontSize: 16,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50, // Move it below the status bar
+    left: 20,
+    backgroundColor: '#E0A800',
+    padding: 10,
+    borderRadius: 25,
+    zIndex: 1, // Ensure it's above other elements
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  logo: {
+    position: 'absolute',
+    top: 80, // Adjust to position the logo lower
+    alignSelf: 'center',
+    width: 200,  // Increased size of the logo
+    height: 200, // Increased size of the logo
+    resizeMode: 'contain', // Ensure the logo keeps its aspect ratio
+  },
+});
