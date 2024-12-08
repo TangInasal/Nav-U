@@ -18,17 +18,23 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18' # Use Node.js 18+ to support ReadableStream
 
       # Step 3: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 4: Build the web app
+      # Step 4: Ensure Undici Compatibility (ReadableStream Fix)
+      - name: Polyfill ReadableStream
+        run: |
+          echo "if (typeof ReadableStream === 'undefined') global.ReadableStream = require('stream/web').ReadableStream;" > readable-polyfill.js
+          cat readable-polyfill.js >> node_modules/undici/lib/web/fetch/index.js
+
+      # Step 5: Build the web app
       - name: Build Web Version
         run: npx expo export:web
 
-      # Step 5: Deploy to GitHub Pages
+      # Step 6: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
