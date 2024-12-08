@@ -32,7 +32,7 @@ jobs:
 
       # Step 5: Build the web app
       - name: Build Web Version
-        run: npx expo export:web
+        run: npx expo build:web # Use expo build:web for the web production build
 
       # Step 6: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
