@@ -30,9 +30,9 @@ jobs:
           echo "if (typeof ReadableStream === 'undefined') global.ReadableStream = require('stream/web').ReadableStream;" > readable-polyfill.js
           cat readable-polyfill.js >> node_modules/undici/lib/web/fetch/index.js
 
-      # Step 5: Build the web app
-      - name: Build Web Version
-        run: npx expo build:web # Use expo build:web for the web production build
+      # Step 5: Export the web app
+      - name: Export Web Version
+        run: npx expo export:web # Correct command for building the web app
 
       # Step 6: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
